@@ -59,11 +59,18 @@
     <Compile Include="ClubModel\Club.cs" />
     <Compile Include="ClubModel\ClubContext.cs" />
     <Compile Include="ClubModel\ClubEvent.cs" />
+    <Compile Include="ClubModel\Course.cs" />
+    <Compile Include="ClubModel\CourseData.cs" />
     <Compile Include="ClubModel\Members.cs" />
     <Compile Include="ClubModel\Student.cs" />
+    <Compile Include="ClubModel\StudentCourse.cs" />
     <Compile Include="Migrations\201711231802374_Initial Clubs.cs" />
     <Compile Include="Migrations\201711231802374_Initial Clubs.Designer.cs">
       <DependentUpon>201711231802374_Initial Clubs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711241027286_course-and-students-added.cs" />
+    <Compile Include="Migrations\201711241027286_course-and-students-added.Designer.cs">
+      <DependentUpon>201711241027286_course-and-students-added.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
@@ -71,7 +78,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="Migrations\Courses.csv" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Migrations\201711241027286_course-and-students-added.resx">
+      <DependentUpon>201711241027286_course-and-students-added.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\TestStudents.csv" />
   </ItemGroup>
   <ItemGroup>

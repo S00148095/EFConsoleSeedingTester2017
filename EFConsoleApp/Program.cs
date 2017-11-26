@@ -24,6 +24,8 @@ namespace EFConsoleApp
             {
                 SeedClub(context);
                 SeedStudents(context);
+                SeedCourses(context);
+                SeedStudentCourses(context);
             }
         }
 
@@ -31,7 +33,7 @@ namespace EFConsoleApp
         private static void SeedClub(ClubContext context)
         {
             #region club 1
-            context.Clubs.AddOrUpdate(c => new { c.ClubName, c.clubMembers },
+            context.Clubs.AddOrUpdate(c => c.ClubName,
 
             new Club
             {
@@ -58,7 +60,7 @@ namespace EFConsoleApp
             });
             #endregion
             #region club 2
-            context.Clubs.AddOrUpdate(c => new { c.ClubName, c.clubMembers },
+            context.Clubs.AddOrUpdate(c => c.ClubName,
             new Club
             {
                 ClubName = "The Chess Club",
@@ -113,6 +115,59 @@ namespace EFConsoleApp
                 .Select(s => s.StudentID.ToString()).Take(10).ToList();
             // return the selected students as a relaized list
             return context.Students.Where(s => subset.Contains(s.StudentID)).ToList();
+        }
+
+        public static void SeedCourses(ClubContext context)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "EFConsoleApp.Migrations.Courses.csv";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    CsvReader csvReader = new CsvReader(reader);
+                    csvReader.Configuration.HasHeaderRecord = false;
+                    var testCourses = csvReader.GetRecords<CourseData>().ToArray();
+                    foreach (var data in testCourses)
+                    {
+                        context.Courses.AddOrUpdate(c =>
+                        new { c.CourseCode, c.CourseName }, 
+                        new Course { CourseCode=data.CourseCode,
+                                     CourseName=data.CourseName,
+                                     CourseYear=data.CourseYear});
+
+                    }
+                }
+            }
+
+            context.SaveChanges();
+        }
+
+        public static void SeedStudentCourses(ClubContext context)
+        {
+            var randomSetStudent = context.Students.Where(s => !context.StudentCourses.Any(sc => sc.StudentID == s.StudentID))
+                                                   .Select(s => new { s.StudentID, r = Guid.NewGuid() });
+            List<string> subset = randomSetStudent.OrderBy(s => s.r)
+                                                  .Select(s => s.StudentID.ToString())
+                                                  .Take(4).ToList();
+            var randomCourseSet = context.Courses.Select(c => new { c.CourseID, r = Guid.NewGuid() });
+            int courseID = randomCourseSet.OrderBy(c => c.r)
+                                                  .Select(c => c.CourseID)
+                                                  .Take(1).ToList()[0];
+
+            foreach (var data in subset)
+            {
+                context.StudentCourses.AddOrUpdate(sc =>
+                new { sc.StudentID, sc.CourseID },
+                new StudentCourse
+                {
+                    StudentID = data,
+                    CourseID = courseID
+                });
+
+            }
+
+            context.SaveChanges();
         }
     }
 }
